@@ -1,0 +1,103 @@
+body, html {
+	background: #222;
+}
+#stage {
+	display: table;
+	border-left: 1px solid #666;
+	border-top: 1px solid #666;
+}
+
+#flagCount, #flagCountL {
+	color: white;
+}
+
+.outerContainer {
+	position: relative;
+	text-align: center;
+}
+.container {
+	position: relative;
+	display: inline-block;
+	margin: 40px auto;
+}
+.row {
+	display: table-row;
+}
+
+.field {
+	display: table-cell;
+	width: 34px;
+	height: 34px;
+	min-width: 32px;
+	min-height: 32px;
+	text-align: center;
+	vertical-align: middle;
+	border-right: 1px solid #666;
+	border-bottom: 1px solid #666;
+	font-weight: bold;
+	font-size:21px;
+	cursor: pointer;
+	background: #b7b7b7;
+}
+
+.openfield {
+	background: #d7d7d7;
+}
+
+.wrongMark {
+	background: #b99
+}
+
+.marked::before {
+	/* Flag emoji */
+	content: "\01F6A9";
+}
+
+.boom::before {
+	/* Explosion emoji */
+	content: "\01F4A5";
+}
+
+.bomb {
+	font-size:18px;
+}
+.bomb::before {
+	/* Bomb emoji */
+	content: "\01F4A3";
+}
+
+.hamburger::before {
+	content: "\01F354";
+}
+
+.color1 {
+	color: #c00;
+}
+
+.color2 {
+	color: #0a0;
+}
+
+.color3 {
+	color: #00b;
+}
+
+.color4 {
+	color: #099;
+}
+
+.color5 {
+	color: #980;
+}
+
+.color6 {
+	color: #909;
+}
+
+.color7 {
+	color: #086;
+}
+
+.color8 {
+	color: #069;
+}
