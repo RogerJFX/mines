@@ -1,0 +1,2 @@
+# mines
+Minimalistic Minesweeper
