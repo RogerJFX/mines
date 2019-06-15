@@ -3,10 +3,9 @@ Element.prototype.addClass = function(clazz) {
 }
 
 Element.prototype.removeClass = function(clazz) {
-	const old = this.getAttribute('class');
-	const splitted = old.split(' ');
-	const n = splitted.filter(item => item !== clazz);
-	this.setAttribute('class', n.join(' '));
+	this.setAttribute('class', 
+		this.getAttribute('class').split(' ').filter(item => item !== clazz).join(' ')
+	);
 }
 
 Element.prototype.hasClass = function(clazz) {
@@ -20,16 +19,17 @@ $ms = window.$ms || {};
 	const MINE = 1;
 	const OTHER = 0;
 
-	const cols = 30;
-	const rows = 18;
-	const numMines = 99;
-
-	const fieldsToOpen = cols * rows - numMines;
+	let settings = {
+		cols: 30,
+		rows: 18,
+		numMines: 99,
+		fieldsToOpen: this.cols * this.rows - this.numMines
+	};
 	
 	let openCount = 0;
 	let markedCount = 0;
 	let playing = true;
-	const fields = [];
+	let fields = [];
 	
 	let countFn;
 	
@@ -135,7 +135,7 @@ $ms = window.$ms || {};
 	}
 
 	function checkReady() {
-		if(++openCount === fieldsToOpen) {
+		if(++openCount === settings.fieldsToOpen) {
 			yahoo();
 			playing = false;
 		}
@@ -148,7 +148,7 @@ $ms = window.$ms || {};
 	function countMarked(add) {
 		markedCount += add;
 		if(countFn) {
-			countFn(markedCount);
+			countFn(markedCount, settings.numMines);
 		}
 	}
 
@@ -156,10 +156,10 @@ $ms = window.$ms || {};
 		const stage = document.getElementById('stage');
 		stage.innerHTML = '';
 		let i, j;
-		for (i = 0; i < rows; i++) {
+		for (i = 0; i < settings.rows; i++) {
 			const row = document.createElement('DIV');
 			row.setAttribute('class', 'row');
-			for(j = 0; j < cols; j++) {
+			for(j = 0; j < settings.cols; j++) {
 				row.appendChild(fields[j][i].createNode());
 			}
 			stage.appendChild(row);
@@ -170,21 +170,21 @@ $ms = window.$ms || {};
 		return Math.floor(Math.random() * max);
 	}
 
-	function createMineCoords() {
-		const x = random(cols);
-		const y = random(rows);
+	function createMineCoords(settings) {
+		const x = random(settings.cols);
+		const y = random(settings.rows);
 		if(fields[x][y]) {
-			return createMineCoords();
+			return createMineCoords(settings);
 		}
 		return [x, y];
 	}
 
 	function scanNeighbors4(x, y, fn) {
 		const startX = x > 0 ? x - 1 : x;
-		const endX = x < cols ? x + 1 : x;
+		const endX = x < settings.cols ? x + 1 : x;
 		
 		const startY = y > 0 ? y - 1 : y;
-		const endY = y < rows ? y + 1 : y;
+		const endY = y < settings.rows ? y + 1 : y;
 		
 		let i, j;
 		for(i = startX; i <= endX; i++) {
@@ -205,11 +205,12 @@ $ms = window.$ms || {};
 	}
 
 	function createFields() {
-		for(let i = 0; i < cols; i++) {
+		fields = [];
+		for(let i = 0; i < settings.cols; i++) {
 			fields[i] = [];
 		}
-		for(let i = 0; i < numMines; i++) {
-			const coords = createMineCoords();
+		for(let i = 0; i < settings.numMines; i++) {
+			const coords = createMineCoords(settings);
 			fields[coords[0]][coords[1]] = new Field(coords[0], coords[1], MINE, 0);
 		}
 		iterate((i, j) => { 
@@ -229,14 +230,18 @@ $ms = window.$ms || {};
 
 	function iterate(fn) {
 		let i, j;
-		for(i = 0; i < cols; i++) {
-			for(j = 0; j < rows; j++) {
+		for(i = 0; i < settings.cols; i++) {
+			for(j = 0; j < settings.rows; j++) {
 				fn(i, j);
 			}
 		}	
 	}
 
-	function initGame() {
+	function initGame(_settings) {
+		if(_settings) {
+			const a = JSON.parse(_settings);
+			settings = {cols:a[0], rows:a[1], numMines:a[2], fieldsToOpen: a[0] * a[1] - a[2]};
+		}
 		createFields();
 		fillBoard();
 		playing = true;
