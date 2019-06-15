@@ -4,12 +4,19 @@
 	<link rel="stylesheet" href="styles.css">
 	<script src="./game.js"></script>
 </head>
-<body onload="$ms.subscribeFlagCount(function(i){document.getElementById('flagCount').innerHTML=i});">
+<body onload="$ms.subscribeFlagCount(function(i, o){document.getElementById('flagCount').innerHTML=i+' of '+o});">
 	<div class="outerContainer">
 	<div class="container">
 		<div id="stage"></div>
 		<br />
-		<button onclick="$ms.startGame();">New Game</button>
+		<!--<button onclick="$ms.startGame();">New Game</button>-->
+		<select onchange="$ms.startGame(value);this.value='';">
+			<option value="">New game</option>
+			<option value="[8,8,10]">8 x 8, 10 mines</option>
+			<option value="[16,16,40]">16 x 16, 40 mines</option>
+			<option value="[30,16,99]">30 x 16, 99 mines</option>
+			<option value="[36,22,169]">40 x 20, 169 mines</option>
+		</select>
 		<span id="flagCountL">🚩&nbsp;</span><span id="flagCount">0</span>
 	</div></div>
 </body>
