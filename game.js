@@ -1,14 +1,14 @@
-Element.prototype.addClass = function(clazz) {
+Element.prototype.addClass = Element.prototype.addClass || function(clazz) {
 	this.setAttribute('class', this.getAttribute('class') + ' ' + clazz);
 }
 
-Element.prototype.removeClass = function(clazz) {
+Element.prototype.removeClass = Element.prototype.removeClass || function(clazz) {
 	this.setAttribute('class', 
 		this.getAttribute('class').split(' ').filter(item => item !== clazz).join(' ')
 	);
 }
 
-Element.prototype.hasClass = function(clazz) {
+Element.prototype.hasClass = Element.prototype.hasClass || function(clazz) {
 	return this.getAttribute('class').split(' ').find(item => item === clazz) === clazz;
 }
 
@@ -34,6 +34,7 @@ $ms = window.$ms || {};
 	let countFn;
 	
 	self.startGame = initGame;
+	self.notifyLoaded = notifyLoaded;
 	
 	function Field(x, y, _fType, _numMines) {
 		const me = this;
@@ -46,6 +47,7 @@ $ms = window.$ms || {};
 		this.reveal = reveal;
 		this.feed = feed;
 		
+		let stage;
 		let myNode;
 		let marked = false;
 		
@@ -153,7 +155,6 @@ $ms = window.$ms || {};
 	}
 
 	function fillBoard() {
-		const stage = document.getElementById('stage');
 		stage.innerHTML = '';
 		let i, j;
 		for (i = 0; i < settings.rows; i++) {
@@ -250,12 +251,13 @@ $ms = window.$ms || {};
 		countMarked(0);
 		// show();
 	}
-
-	window.addEventListener('load', function() {
-		document.getElementById('stage').oncontextmenu = function(evt) {
+	
+	function notifyLoaded(_stage) {
+		stage = _stage;
+		stage.oncontextmenu = function(evt) {
 			return false;
 		}
 		initGame();
-	});
+	}
 
 })($ms);
