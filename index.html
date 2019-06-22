@@ -3,14 +3,28 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="styles.css">
 	<script src="./game.js"></script>
+	<script src="./ui.js"></script>
+	<script>		
+		window.addEventListener('load', () => {
+			$ms.controller.subscribeFlagCount((i, o) => {
+				document.getElementById('flagCount').innerHTML = i + ' of ' + o;
+			});
+			
+			$ms.controller.notifyLoaded(document.getElementById('stage'), '[16,16,40]', $ms.ui.classMap);
+			
+			document.getElementById('gameSelect').addEventListener('change', (event) => {
+				$ms.controller.startGame(event.srcElement.value);
+				event.srcElement.value = '';
+			});
+		});
+	</script>
 </head>
-<body onload="$ms.subscribeFlagCount(function(i, o){document.getElementById('flagCount').innerHTML=i+' of '+o});$ms.notifyLoaded(document.getElementById('stage'));">
+<body>
 	<div class="outerContainer">
 	<div class="container">
 		<div id="stage"></div>
 		<br />
-		<!--<button onclick="$ms.startGame();">New Game</button>-->
-		<select onchange="$ms.startGame(value);this.value='';">
+		<select id="gameSelect">
 			<option value="">New game</option>
 			<option value="[8,8,10]">8 x 8, 10 mines</option>
 			<option value="[16,16,40]">16 x 16, 40 mines</option>
