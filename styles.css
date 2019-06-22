@@ -51,6 +51,15 @@ body, html {
 .marked::before {
 	/* Flag emoji */
 	content: "\01F6A9";
+	
+}
+
+.question {
+	font-size:16px;
+}
+.question::before {
+	content: "\02753";
+	color: #c42;
 }
 
 .boom::before {
