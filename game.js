@@ -1,17 +1,12 @@
-Element.prototype.addClass = Element.prototype.addClass || function(clazz) {
-	this.setAttribute('class', this.getAttribute('class') + ' ' + clazz);
-}
-
-Element.prototype.removeClass = Element.prototype.removeClass || function(clazz) {
-	this.setAttribute('class', 
-		this.getAttribute('class').split(' ').filter(item => item !== clazz).join(' ')
-	);
-}
-
-Element.prototype.hasClass = Element.prototype.hasClass || function(clazz) {
-	return this.getAttribute('class').split(' ').find(item => item === clazz) === clazz;
-}
-
+/**
+ * Controller. Should work in many UI contexts without any clashes. 
+ * States of fields are marked by classes.
+ * 
+ * See ui.js.
+ * 
+ * Written using Geany Editor.
+ */
+ 
 $ms = window.$ms || {};
 
 (function Game(self) {
@@ -19,12 +14,8 @@ $ms = window.$ms || {};
 	const MINE = 1;
 	const OTHER = 0;
 
-	let settings = {
-		cols: 30,
-		rows: 18,
-		numMines: 99,
-		fieldsToOpen: this.cols * this.rows - this.numMines
-	};
+	let settings;
+	let classMap;
 	
 	let openCount = 0;
 	let markedCount = 0;
@@ -36,8 +27,17 @@ $ms = window.$ms || {};
 	self.startGame = initGame;
 	self.notifyLoaded = notifyLoaded;
 	
+	self.subscribeFlagCount = (fn) => {
+		countFn = fn;
+	};
+	
+	self.show = () => { // cheat or debug.
+		iterate((i, j) => fields[i][j].show());
+	};
+	
 	function Field(x, y, _fType, _numMines) {
 		const me = this;
+		
 		this.fType = _fType;
 		this.numMines = _numMines;
 		this.open = false;
@@ -49,24 +49,44 @@ $ms = window.$ms || {};
 		
 		let stage;
 		let myNode;
-		let marked = false;
+		let marked = 0;
 		
-		function checkMarked(nMarked) {
-			if(marked && !nMarked) {
-				countMarked(-1);
-			} else if(!marked && nMarked) {
-				countMarked(1);
+		me.show = () => { // cheat or debug.
+			if(me.fType !== MINE) {
+				$ms.ui.openField(myNode, me.numMines);
+				myNode.addClass(classMap.openField);
 			}
-			marked = nMarked;
+		};
+
+		function handleMarx() {
+			if(!playing || me.open) {
+				return false; // Hm...
+			}
+			if(++marked > 2) {
+				marked = 0;
+			}
+			switch(marked) {
+				case 0:
+					myNode.removeClass(classMap.question)
+					break;
+				case 1:
+					countMarked(1);
+					myNode.addClass(classMap.marked)
+					break;
+				case 2:
+				default:
+					countMarked(-1);
+					myNode.removeClass(classMap.marked)
+						.addClass(classMap.question);
+			}
 		}
 
 		function doClick() {
 			if(playing && !me.open && !marked) {
-				checkMarked(false);
-				myNode.removeClass('marked');
-				myNode.addClass('openfield');
+				myNode.removeClass(classMap.marked)
+					.addClass(classMap.openField);
 				if(me.fType === MINE) {
-					myNode.addClass('boom');
+					myNode.addClass(classMap.boom);
 					playing = false;
 					revealAll();
 				} else {
@@ -78,7 +98,7 @@ $ms = window.$ms || {};
 
 		function openField() {
 			me.open = true;
-			myNode.innerHTML = me.numMines === 0 ? '' : me.numMines;
+			$ms.ui.openField(myNode, me.numMines);
 			if(me.numMines === 0){
 				scanNeighbors4(x, y, function(i, j) {
 					if(fields[i] && fields[i][j] && !fields[i][j].open) {
@@ -89,42 +109,32 @@ $ms = window.$ms || {};
 		}
 		
 		function reveal() {
-			if(!myNode.hasClass('openfield')) {
+			if(!myNode.hasClass(classMap.openField)) {
 				if(me.fType === OTHER) {
-					if(myNode.hasClass('marked')) {
-						myNode.addClass('wrongMark');
+					if(myNode.hasClass(classMap.marked)) {
+						myNode.addClass(classMap.wrongMark);
 					}
-				} else if(!myNode.hasClass('boom') && !myNode.hasClass('marked')) {
-					myNode.addClass('bomb');
+				} else if(!myNode.hasClass(classMap.boom) && !myNode.hasClass(classMap.marked)) {
+					myNode.removeClass(classMap.question)
+						.addClass(classMap.bomb);
 				}
-			}
-		}
-		
-		me.show = function() {
-			if(me.fType !== MINE) {
-				myNode.innerHTML = me.numMines === 0 ? '' : me.numMines;
-				myNode.addClass('openfield');
 			}
 		}
 		
 		function createNode() {
-			const element = document.createElement('DIV');
-			element.setAttribute('class', 'field color' + me.numMines);
-			element.addEventListener('contextmenu', function(evt) {
-				if(playing && !me.open) {
-					marked ? element.removeClass('marked') : element.addClass('marked');
-					checkMarked(!marked);
-				}
-			});
-			element.addEventListener('click', doClick);
+			const element = $ms.ui.createNode(
+				me.numMines,
+				doClick,
+				handleMarx
+			);
 			myNode = element;
 			return element;
 		}
 		
 		function feed() {
-			myNode.removeClass('marked');
-			myNode.addClass('openfield');
-			myNode.addClass('hamburger');
+			myNode.removeClass(classMap.marked)
+				.addClass(classMap.openField)
+				.addClass(classMap.hamburger);
 		}
 	}
 
@@ -143,27 +153,10 @@ $ms = window.$ms || {};
 		}
 	}
 
-	self.subscribeFlagCount = function(fn) {
-		countFn = fn;
-	}
-
 	function countMarked(add) {
 		markedCount += add;
 		if(countFn) {
 			countFn(markedCount, settings.numMines);
-		}
-	}
-
-	function fillBoard() {
-		stage.innerHTML = '';
-		let i, j;
-		for (i = 0; i < settings.rows; i++) {
-			const row = document.createElement('DIV');
-			row.setAttribute('class', 'row');
-			for(j = 0; j < settings.cols; j++) {
-				row.appendChild(fields[j][i].createNode());
-			}
-			stage.appendChild(row);
 		}
 	}
 
@@ -174,10 +167,10 @@ $ms = window.$ms || {};
 	function createMineCoords(settings) {
 		const x = random(settings.cols);
 		const y = random(settings.rows);
-		if(fields[x][y]) {
+		if(fields[y][x]) {
 			return createMineCoords(settings);
 		}
-		return [x, y];
+		return [y, x];
 	}
 
 	function scanNeighbors4(x, y, fn) {
@@ -207,7 +200,7 @@ $ms = window.$ms || {};
 
 	function createFields() {
 		fields = [];
-		for(let i = 0; i < settings.cols; i++) {
+		for(let i = 0; i < settings.rows; i++) {
 			fields[i] = [];
 		}
 		for(let i = 0; i < settings.numMines; i++) {
@@ -225,14 +218,10 @@ $ms = window.$ms || {};
 		iterate((i, j) => fields[i][j].reveal());
 	}
 
-	function show() {
-		iterate((i, j) => fields[i][j].show());
-	}
-
 	function iterate(fn) {
 		let i, j;
-		for(i = 0; i < settings.cols; i++) {
-			for(j = 0; j < settings.rows; j++) {
+		for(i = 0; i < settings.rows; i++) {
+			for(j = 0; j < settings.cols; j++) {
 				fn(i, j);
 			}
 		}	
@@ -244,20 +233,18 @@ $ms = window.$ms || {};
 			settings = {cols:a[0], rows:a[1], numMines:a[2], fieldsToOpen: a[0] * a[1] - a[2]};
 		}
 		createFields();
-		fillBoard();
+		$ms.ui.fillBoard(stage, fields);
 		playing = true;
 		openCount = 0;
 		markedCount = 0;
 		countMarked(0);
-		// show();
 	}
 	
-	function notifyLoaded(_stage) {
+	function notifyLoaded(_stage, _settings, _classMap) {
 		stage = _stage;
-		stage.oncontextmenu = function(evt) {
-			return false;
-		}
-		initGame();
+		classMap = _classMap;
+		$ms.ui.init(stage);
+		initGame(_settings);
 	}
 
-})($ms);
+})($ms.controller = $ms.controller || {});
