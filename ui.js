@@ -66,10 +66,10 @@ $ms = window.$ms || {};
 	};
 	
 	self.init = (stage, controller) => {
-		controller.injectFillBoardUiFn(fillBoard);
-		controller.injectOpenFieldUiFn(openField);
-		controller.injectCreateNodeFn(createNode);
-		controller.injectClassMap(classMap);
+		controller.injectFillBoardUiFn(fillBoard)
+			.injectOpenFieldUiFn(openField)
+			.injectCreateNodeFn(createNode)
+			.injectClassMap(classMap);
 		stage.oncontextmenu = function(evt) {
 			return false;
 		}
