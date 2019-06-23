@@ -238,7 +238,6 @@ $ms = window.$ms || {};
 		openCount = 0;
 		markedCount = 0;
 		countMarked(0);
-		self.show();
 	}
 	
 	function notifyLoaded(_stage, _settings, _classMap) {
