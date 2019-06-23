@@ -9,8 +9,9 @@
 			$ms.controller.subscribeFlagCount((i, o) => {
 				document.getElementById('flagCount').innerHTML = i + ' of ' + o;
 			});
-			
-			$ms.controller.notifyLoaded(document.getElementById('stage'), '[16,16,40]', $ms.ui.classMap);
+			const stage = document.getElementById('stage');
+			$ms.ui.init(stage, $ms.controller);
+			$ms.controller.notifyLoaded(stage, '[16,16,40]');
 			
 			document.getElementById('gameSelect').addEventListener('change', (event) => {
 				$ms.controller.startGame(event.srcElement.value);
