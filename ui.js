@@ -40,13 +40,11 @@ $ms = window.$ms || {};
 		color: 'color'
 	};
 	
-	self.classMap = classMap;
-	
-	self.openField = (element, numMines) => {
+	function openField (element, numMines) {
 		element.innerHTML = numMines === 0 ? '' : numMines;
 	};
 	
-	self.fillBoard = (stage, fields) => {
+	function fillBoard (stage, fields) {
 		stage.innerHTML = '';
 		let i, j;
 		for (i = 0; i < fields.length; i++) {
@@ -59,7 +57,7 @@ $ms = window.$ms || {};
 		}
 	};
 	
-	self.createNode = (numMines, clickFn, rightClickFn) => {
+	function createNode (numMines, clickFn, rightClickFn) {
 		const element = document.createElement('DIV');
 		element.addClass(classMap.field).addClass(classMap.color + numMines);
 		element.addEventListener('contextmenu', rightClickFn);
@@ -67,7 +65,11 @@ $ms = window.$ms || {};
 		return element;
 	};
 	
-	self.init = (stage) => {
+	self.init = (stage, controller) => {
+		controller.injectFillBoardUiFn(fillBoard);
+		controller.injectOpenFieldUiFn(openField);
+		controller.injectCreateNodeFn(createNode);
+		controller.injectClassMap(classMap);
 		stage.oncontextmenu = function(evt) {
 			return false;
 		}
