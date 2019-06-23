@@ -36,18 +36,22 @@ $ms = window.$ms || {};
 	
 	self.injectFillBoardUiFn = (fn) => {
 		fillBoardUiFn = fn;
+		return self;
 	};
 	
 	self.injectOpenFieldUiFn = (fn) => {
 		openFieldUiFn = fn;
+		return self;
 	};
 	
 	self.injectCreateNodeFn = (fn) => {
 		createNodeUiFn = fn;
+		return self;
 	};
 	
 	self.injectClassMap = (map) => {
 		classMap = map;
+		return self;
 	};
 	
 	self.show = () => { // cheat or debug.
