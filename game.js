@@ -70,7 +70,6 @@ $ms = window.$ms || {};
 		this.reveal = reveal;
 		this.feed = feed;
 		
-		let stage;
 		let myNode;
 		let marked = 0;
 		
@@ -256,15 +255,14 @@ $ms = window.$ms || {};
 			settings = {cols:a[0], rows:a[1], numMines:a[2], fieldsToOpen: a[0] * a[1] - a[2]};
 		}
 		createFields();
-		fillBoardUiFn(stage, fields);
+		fillBoardUiFn(fields);
 		playing = true;
 		openCount = 0;
 		markedCount = 0;
 		countMarked(0);
 	}
 	
-	function notifyLoaded(_stage, _settings) {
-		stage = _stage;
+	function notifyLoaded(_settings) {
 		initGame(_settings);
 	}
 
