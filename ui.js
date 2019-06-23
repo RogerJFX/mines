@@ -40,11 +40,13 @@ $ms = window.$ms || {};
 		color: 'color'
 	};
 	
+	let stage;
+	
 	function openField (element, numMines) {
 		element.innerHTML = numMines === 0 ? '' : numMines;
 	};
 	
-	function fillBoard (stage, fields) {
+	function fillBoard (fields) {
 		stage.innerHTML = '';
 		let i, j;
 		for (i = 0; i < fields.length; i++) {
@@ -65,7 +67,8 @@ $ms = window.$ms || {};
 		return element;
 	};
 	
-	self.init = (stage, controller) => {
+	self.init = (_stage, controller) => {
+		stage = _stage;
 		controller.injectFillBoardUiFn(fillBoard)
 			.injectOpenFieldUiFn(openField)
 			.injectCreateNodeFn(createNode)
