@@ -23,12 +23,31 @@ $ms = window.$ms || {};
 	let fields = [];
 	
 	let countFn;
+	let createNodeUiFn;
+	let openFieldUiFn;
+	let fillBoardUiFn;
 	
 	self.startGame = initGame;
 	self.notifyLoaded = notifyLoaded;
 	
 	self.subscribeFlagCount = (fn) => {
 		countFn = fn;
+	};
+	
+	self.injectFillBoardUiFn = (fn) => {
+		fillBoardUiFn = fn;
+	};
+	
+	self.injectOpenFieldUiFn = (fn) => {
+		openFieldUiFn = fn;
+	};
+	
+	self.injectCreateNodeFn = (fn) => {
+		createNodeUiFn = fn;
+	};
+	
+	self.injectClassMap = (map) => {
+		classMap = map;
 	};
 	
 	self.show = () => { // cheat or debug.
@@ -53,7 +72,7 @@ $ms = window.$ms || {};
 		
 		me.show = () => { // cheat or debug.
 			if(me.fType !== MINE) {
-				$ms.ui.openField(myNode, me.numMines);
+				openFieldUiFn(myNode, me.numMines);
 				myNode.addClass(classMap.openField);
 			}
 		};
@@ -98,7 +117,7 @@ $ms = window.$ms || {};
 
 		function openField() {
 			me.open = true;
-			$ms.ui.openField(myNode, me.numMines);
+			openFieldUiFn(myNode, me.numMines);
 			if(me.numMines === 0){
 				scanNeighbors4(x, y, function(i, j) {
 					if(fields[i] && fields[i][j] && !fields[i][j].open) {
@@ -122,7 +141,7 @@ $ms = window.$ms || {};
 		}
 		
 		function createNode() {
-			const element = $ms.ui.createNode(
+			const element = createNodeUiFn(
 				me.numMines,
 				doClick,
 				handleMarx
@@ -233,17 +252,15 @@ $ms = window.$ms || {};
 			settings = {cols:a[0], rows:a[1], numMines:a[2], fieldsToOpen: a[0] * a[1] - a[2]};
 		}
 		createFields();
-		$ms.ui.fillBoard(stage, fields);
+		fillBoardUiFn(stage, fields);
 		playing = true;
 		openCount = 0;
 		markedCount = 0;
 		countMarked(0);
 	}
 	
-	function notifyLoaded(_stage, _settings, _classMap) {
+	function notifyLoaded(_stage, _settings) {
 		stage = _stage;
-		classMap = _classMap;
-		$ms.ui.init(stage);
 		initGame(_settings);
 	}
 
