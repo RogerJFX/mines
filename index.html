@@ -4,19 +4,24 @@
 	<link rel="stylesheet" href="styles.css">
 	<script src="./game.js"></script>
 	<script src="./ui.js"></script>
-	<script>		
+	<script>	
+		const initialSettings = '[16,16,40]';
+		
 		window.addEventListener('load', () => {
+			
 			$ms.controller.subscribeFlagCount((i, o) => {
 				document.getElementById('flagCount').innerHTML = i + ' of ' + o;
 			});
-			const stage = document.getElementById('stage');
-			$ms.ui.init(stage, $ms.controller);
-			$ms.controller.notifyLoaded(stage, '[16,16,40]');
+			
+			$ms.ui.init(document.getElementById('stage'), $ms.controller);
+			
+			$ms.controller.notifyLoaded(initialSettings);
 			
 			document.getElementById('gameSelect').addEventListener('change', (event) => {
 				$ms.controller.startGame(event.srcElement.value);
 				event.srcElement.value = '';
 			});
+			
 		});
 	</script>
 </head>
