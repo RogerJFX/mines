@@ -173,7 +173,7 @@ $ms = window.$ms || {};
 		return [y, x];
 	}
 
-	function scanNeighbors4(x, y, fn) {
+	function scanNeighbors4(y, x, fn) {
 		const startX = x > 0 ? x - 1 : x;
 		const endX = x < settings.cols ? x + 1 : x;
 		
@@ -181,8 +181,8 @@ $ms = window.$ms || {};
 		const endY = y < settings.rows ? y + 1 : y;
 		
 		let i, j;
-		for(i = startX; i <= endX; i++) {
-			for(j = startY; j <= endY; j++) {
+		for(i = startY; i <= endY; i++) {
+			for(j = startX; j <= endX; j++) {
 				fn(i, j);
 			}
 		} 
@@ -238,6 +238,7 @@ $ms = window.$ms || {};
 		openCount = 0;
 		markedCount = 0;
 		countMarked(0);
+		self.show();
 	}
 	
 	function notifyLoaded(_stage, _settings, _classMap) {
